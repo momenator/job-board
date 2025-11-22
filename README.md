@@ -10,6 +10,18 @@ A lightweight job board for minijobs in Munich, built with Astro and Payload CMS
 - 🎨 **Clean UI**: Simple, focused design for job seekers
 - 🔍 **Easy Filtering**: Filter by job type and district
 - 📝 **Headless CMS**: Payload CMS for easy job management
+- 🎭 **Demo Mode**: Works with mock data if database is unavailable
+
+## Demo Mode / Mock Data
+
+**Don't have MongoDB set up?** No problem! The app automatically falls back to mock data if the database is unavailable.
+
+- **8 realistic sample jobs** showcasing different job types
+- **Fully functional filtering** by job type and district
+- **WhatsApp integration** with demo phone numbers
+- **Perfect for testing** the design and UX without setup
+
+To explicitly enable mock data mode, set `USE_MOCK_DATA=true` in your `.env` file. Otherwise, the app will automatically use mock data when Payload CMS is unavailable.
 
 ## Tech Stack
 

@@ -7,7 +7,17 @@ Get the Munich Minijobs board running in 5 minutes!
 - Node.js 18+ installed
 - MongoDB running locally OR MongoDB Atlas account
 
-## Step-by-Step
+## 🎭 Demo Mode (No Database Required!)
+
+**Want to skip the database setup?** You can run the site with mock data:
+
+1. Install dependencies: `npm install`
+2. Start Astro only: `npm run dev`
+3. Visit http://localhost:4321
+
+The site will automatically use 8 sample jobs when the database isn't available. Perfect for testing the design and UX!
+
+## Step-by-Step (Full Setup)
 
 ### 1. Install Dependencies
 

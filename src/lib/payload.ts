@@ -1,6 +1,8 @@
 import type { Job } from '../payload-types';
+import { mockJobs, filterMockJobs, getMockJobById } from './mockData';
 
 const PAYLOAD_API_URL = process.env.PAYLOAD_API_URL || 'http://localhost:3000/api';
+const USE_MOCK_DATA = process.env.USE_MOCK_DATA === 'true';
 
 export interface JobsResponse {
   docs: Job[];
@@ -22,45 +24,109 @@ export async function getJobs(params?: {
   district?: string;
   status?: string;
 }): Promise<JobsResponse> {
-  const queryParams = new URLSearchParams();
+  // Use mock data if explicitly enabled or if API fails
+  if (USE_MOCK_DATA) {
+    const filteredJobs = filterMockJobs({
+      jobType: params?.jobType,
+      district: params?.district,
+      status: params?.status,
+    });
 
-  if (params?.limit) queryParams.set('limit', params.limit.toString());
-  if (params?.page) queryParams.set('page', params.page.toString());
-
-  // Filter by status (default to active)
-  const status = params?.status || 'active';
-  queryParams.set('where[status][equals]', status);
-
-  // Filter by job type
-  if (params?.jobType) {
-    queryParams.set('where[jobType][equals]', params.jobType);
+    return {
+      docs: filteredJobs,
+      totalDocs: filteredJobs.length,
+      limit: params?.limit || 50,
+      totalPages: 1,
+      page: params?.page || 1,
+      pagingCounter: 1,
+      hasPrevPage: false,
+      hasNextPage: false,
+      prevPage: null,
+      nextPage: null,
+    };
   }
 
-  // Filter by district
-  if (params?.district) {
-    queryParams.set('where[district][equals]', params.district);
+  try {
+    const queryParams = new URLSearchParams();
+
+    if (params?.limit) queryParams.set('limit', params.limit.toString());
+    if (params?.page) queryParams.set('page', params.page.toString());
+
+    // Filter by status (default to active)
+    const status = params?.status || 'active';
+    queryParams.set('where[status][equals]', status);
+
+    // Filter by job type
+    if (params?.jobType) {
+      queryParams.set('where[jobType][equals]', params.jobType);
+    }
+
+    // Filter by district
+    if (params?.district) {
+      queryParams.set('where[district][equals]', params.district);
+    }
+
+    // Sort by newest first
+    queryParams.set('sort', '-createdAt');
+
+    const response = await fetch(`${PAYLOAD_API_URL}/jobs?${queryParams.toString()}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch jobs: ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    // Fallback to mock data if API fails
+    console.warn('API unavailable, using mock data:', error);
+    const filteredJobs = filterMockJobs({
+      jobType: params?.jobType,
+      district: params?.district,
+      status: params?.status,
+    });
+
+    return {
+      docs: filteredJobs,
+      totalDocs: filteredJobs.length,
+      limit: params?.limit || 50,
+      totalPages: 1,
+      page: params?.page || 1,
+      pagingCounter: 1,
+      hasPrevPage: false,
+      hasNextPage: false,
+      prevPage: null,
+      nextPage: null,
+    };
   }
-
-  // Sort by newest first
-  queryParams.set('sort', '-createdAt');
-
-  const response = await fetch(`${PAYLOAD_API_URL}/jobs?${queryParams.toString()}`);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch jobs: ${response.statusText}`);
-  }
-
-  return response.json();
 }
 
 export async function getJobByID(id: string): Promise<Job> {
-  const response = await fetch(`${PAYLOAD_API_URL}/jobs/${id}`);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch job: ${response.statusText}`);
+  // Use mock data if explicitly enabled
+  if (USE_MOCK_DATA) {
+    const mockJob = getMockJobById(id);
+    if (!mockJob) {
+      throw new Error('Job not found');
+    }
+    return mockJob;
   }
 
-  return response.json();
+  try {
+    const response = await fetch(`${PAYLOAD_API_URL}/jobs/${id}`);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch job: ${response.statusText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    // Fallback to mock data if API fails
+    console.warn('API unavailable, using mock data:', error);
+    const mockJob = getMockJobById(id);
+    if (!mockJob) {
+      throw new Error('Job not found');
+    }
+    return mockJob;
+  }
 }
 
 export async function getJobBySlug(slug: string): Promise<Job | null> {
