@@ -8,13 +8,13 @@ interface Props {
 const { job } = Astro.props;
 
 const jobTypeLabels: Record<string, string> = {
-  bar: '🍺 Bar Staff',
-  kitchen: '👨‍🍳 Kitchen Helper',
-  delivery: '🚴 Delivery',
-  cleaning: '🧹 Cleaning',
-  warehouse: '📦 Warehouse',
-  event: '🎉 Event Staff',
-  other: '💼 Other',
+  bar: 'BAR STAFF',
+  kitchen: 'KITCHEN',
+  delivery: 'DELIVERY',
+  cleaning: 'CLEANING',
+  warehouse: 'WAREHOUSE',
+  event: 'EVENT STAFF',
+  other: 'WORK',
 };
 
 const jobTypeLabel = jobTypeLabels[job.jobType as string] || job.jobType;
@@ -27,116 +27,202 @@ const dateLabel = daysAgo === 0 ? 'Heute' : daysAgo === 1 ? 'Gestern' : `vor ${d
 
 <article class="job-card">
   <a href={`/jobs/${job.id}`} class="job-card-link">
-    <div class="job-card-header">
-      <h2 class="job-title">{job.title}</h2>
-      <span class="job-type">{jobTypeLabel}</span>
+    <div class="poster-header">
+      <span class="job-type-stamp">{jobTypeLabel}</span>
+      <span class="urgent-mark">★ HIRING NOW ★</span>
     </div>
 
-    <div class="job-meta">
-      <span class="meta-item">📍 {job.district}</span>
-      <span class="meta-item">💰 €{job.hourlyRate}/Std</span>
-      <span class="meta-item">⏰ {job.hoursPerWeek}</span>
+    <h2 class="job-title">{job.title.toUpperCase()}</h2>
+
+    <div class="job-details">
+      <div class="detail-line">
+        <span class="detail-label">LOCATION:</span>
+        <span class="detail-value">{job.district}</span>
+      </div>
+      <div class="detail-line">
+        <span class="detail-label">PAY:</span>
+        <span class="detail-value">€{job.hourlyRate}/HR</span>
+      </div>
+      <div class="detail-line">
+        <span class="detail-label">HOURS:</span>
+        <span class="detail-value">{job.hoursPerWeek}</span>
+      </div>
     </div>
 
-    <div class="job-footer">
-      <span class="job-date">{dateLabel}</span>
+    <div class="tear-off">
+      <div class="tear-line"></div>
+      <span class="apply-now">→ TAP TO APPLY ←</span>
     </div>
   </a>
 </article>
 
 <style>
   .job-card {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 0.5rem;
-    overflow: hidden;
-    transition: all 0.2s ease;
+    background: var(--chalk);
+    border: var(--border-thick) solid var(--ink);
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.2);
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .job-card::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20%;
+    width: 12px;
+    height: 12px;
+    background: var(--concrete);
+    border: 2px solid var(--ink);
+    transform: rotate(45deg);
+    z-index: 10;
   }
 
   .job-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 rgba(0, 0, 0, 0.3);
   }
 
   .job-card-link {
     display: block;
-    padding: 1.5rem;
+    padding: 2rem 1.5rem 1.5rem;
     text-decoration: none;
-    color: inherit;
+    color: var(--ink);
   }
 
-  .job-card-header {
+  .poster-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
+    margin-bottom: 1.5rem;
     gap: 1rem;
-    margin-bottom: 1rem;
+  }
+
+  .job-type-stamp {
+    background: var(--ink);
+    color: var(--neon-yellow);
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    border: 2px solid var(--ink);
+    transform: rotate(-2deg);
+  }
+
+  .urgent-mark {
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--graffiti);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
   }
 
   .job-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.4;
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+    word-wrap: break-word;
+    border-left: 6px solid var(--ink);
+    padding-left: 1rem;
   }
 
-  .job-type {
-    background: var(--bg-gray);
-    padding: 0.25rem 0.75rem;
-    border-radius: 1rem;
+  .job-details {
+    margin-bottom: 1.5rem;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1.5rem,
+      var(--paper-dark) 1.5rem,
+      var(--paper-dark) calc(1.5rem + 1px)
+    );
+    padding: 0.5rem 0;
+  }
+
+  .detail-line {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Space Mono', monospace;
     font-size: 0.875rem;
-    white-space: nowrap;
-    flex-shrink: 0;
   }
 
-  .job-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1rem;
+  .detail-label {
+    font-weight: 700;
+    min-width: 90px;
   }
 
-  .meta-item {
-    font-size: 0.875rem;
-    color: var(--text-light);
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
+  .detail-value {
+    font-weight: 400;
   }
 
-  .job-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .tear-off {
+    border-top: 2px dashed var(--concrete);
     padding-top: 1rem;
-    border-top: 1px solid var(--border);
+    margin-top: 1rem;
   }
 
-  .job-date {
-    font-size: 0.75rem;
-    color: var(--text-light);
+  .tear-line {
+    height: 1px;
+    background: repeating-linear-gradient(
+      90deg,
+      var(--concrete) 0px,
+      var(--concrete) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    margin-bottom: 0.75rem;
+  }
+
+  .apply-now {
+    display: block;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    background: var(--neon-yellow);
+    padding: 0.75rem;
+    border: var(--border-thin) solid var(--ink);
   }
 
   @media (max-width: 768px) {
     .job-card-link {
-      padding: 1rem;
-    }
-
-    .job-card-header {
-      flex-direction: column;
-      align-items: flex-start;
+      padding: 1.5rem 1rem 1rem;
     }
 
     .job-title {
-      font-size: 1.125rem;
+      font-size: 1.5rem;
+      padding-left: 0.75rem;
+      border-left-width: 4px;
     }
 
-    .job-meta {
-      gap: 0.75rem;
+    .poster-header {
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
-    .meta-item {
-      font-size: 0.8125rem;
+    .job-type-stamp {
+      font-size: 0.625rem;
+      padding: 0.375rem 0.75rem;
+    }
+
+    .urgent-mark {
+      font-size: 0.5rem;
+    }
+
+    .detail-line {
+      font-size: 0.75rem;
+    }
+
+    .detail-label {
+      min-width: 75px;
     }
   }
 </style>
