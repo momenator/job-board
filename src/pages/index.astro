@@ -1,0 +1,246 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import JobCard from '../components/JobCard.astro';
+import { getJobs } from '../lib/payload';
+
+// Get query parameters for filtering
+const url = Astro.url;
+const jobType = url.searchParams.get('jobType') || undefined;
+const district = url.searchParams.get('district') || undefined;
+
+// Fetch jobs from Payload CMS
+let jobs;
+let error = null;
+
+try {
+  const response = await getJobs({
+    limit: 50,
+    jobType,
+    district,
+  });
+  jobs = response.docs;
+} catch (e) {
+  error = e instanceof Error ? e.message : 'Failed to load jobs';
+  jobs = [];
+}
+---
+
+<BaseLayout title="Munich Minijobs - Find Your Next Job">
+  <div class="container">
+    <div class="hero">
+      <h1>Find Minijobs in Munich</h1>
+      <p>Discover opportunities for bar staff, kitchen helpers, delivery, and more</p>
+    </div>
+
+    <div class="filters">
+      <form method="get" class="filter-form">
+        <div class="filter-group">
+          <label for="jobType">Job Type</label>
+          <select name="jobType" id="jobType">
+            <option value="">All Types</option>
+            <option value="bar" selected={jobType === 'bar'}>Bar Staff</option>
+            <option value="kitchen" selected={jobType === 'kitchen'}>Kitchen Helper</option>
+            <option value="delivery" selected={jobType === 'delivery'}>Delivery</option>
+            <option value="cleaning" selected={jobType === 'cleaning'}>Cleaning</option>
+            <option value="warehouse" selected={jobType === 'warehouse'}>Warehouse</option>
+            <option value="event" selected={jobType === 'event'}>Event Staff</option>
+            <option value="other" selected={jobType === 'other'}>Other</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="district">District</label>
+          <select name="district" id="district">
+            <option value="">All Districts</option>
+            <option value="altstadt-lehel" selected={district === 'altstadt-lehel'}>Altstadt-Lehel</option>
+            <option value="ludwigsvorstadt-isarvorstadt" selected={district === 'ludwigsvorstadt-isarvorstadt'}>Ludwigsvorstadt-Isarvorstadt</option>
+            <option value="maxvorstadt" selected={district === 'maxvorstadt'}>Maxvorstadt</option>
+            <option value="schwabing-west" selected={district === 'schwabing-west'}>Schwabing-West</option>
+            <option value="au-haidhausen" selected={district === 'au-haidhausen'}>Au-Haidhausen</option>
+            <option value="sendling" selected={district === 'sendling'}>Sendling</option>
+            <option value="neuhausen-nymphenburg" selected={district === 'neuhausen-nymphenburg'}>Neuhausen-Nymphenburg</option>
+            <option value="giesing" selected={district === 'giesing'}>Giesing</option>
+            <option value="bogenhausen" selected={district === 'bogenhausen'}>Bogenhausen</option>
+            <option value="pasing-obermenzing" selected={district === 'pasing-obermenzing'}>Pasing-Obermenzing</option>
+          </select>
+        </div>
+
+        <button type="submit" class="filter-button">Filter</button>
+        {(jobType || district) && (
+          <a href="/" class="clear-button">Clear</a>
+        )}
+      </form>
+    </div>
+
+    {error && (
+      <div class="error-message">
+        <p>⚠️ {error}</p>
+        <p class="error-hint">Make sure Payload CMS is running on port 3000</p>
+      </div>
+    )}
+
+    {!error && jobs.length === 0 && (
+      <div class="no-jobs">
+        <p>No jobs found matching your criteria.</p>
+        <a href="/">Clear filters</a>
+      </div>
+    )}
+
+    <div class="jobs-grid">
+      {jobs.map((job) => (
+        <JobCard job={job} />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .hero p {
+    font-size: 1.125rem;
+    color: var(--text-light);
+  }
+
+  .filters {
+    background: var(--bg-gray);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .filter-form {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+
+  .filter-group {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text);
+  }
+
+  .filter-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    background: var(--bg);
+  }
+
+  .filter-button {
+    padding: 0.75rem 2rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .filter-button:hover {
+    background: var(--primary-dark);
+  }
+
+  .clear-button {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--text-light);
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .clear-button:hover {
+    border-color: var(--text);
+    color: var(--text);
+  }
+
+  .jobs-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  .error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .error-hint {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+
+  .no-jobs {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-light);
+  }
+
+  .no-jobs a {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  @media (min-width: 768px) {
+    .jobs-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 1.75rem;
+    }
+
+    .hero p {
+      font-size: 1rem;
+    }
+
+    .filter-form {
+      flex-direction: column;
+    }
+
+    .filter-group {
+      width: 100%;
+    }
+
+    .filter-button,
+    .clear-button {
+      width: 100%;
+    }
+  }
+</style>

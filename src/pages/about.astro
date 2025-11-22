@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="About - Munich Minijobs" description="Learn about Munich Minijobs - connecting job seekers with opportunities">
+  <div class="container">
+    <div class="about-content">
+      <h1>About Munich Minijobs</h1>
+
+      <section class="section">
+        <h2>Our Mission</h2>
+        <p>
+          We connect job seekers in Munich with minijob opportunities that don't require extensive skills or verification.
+          Whether you're looking for bar staff, kitchen helper, delivery, or other positions, we make it easy to find and apply.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>How It Works</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Browse Jobs</h3>
+            <p>Filter by job type and district to find opportunities near you</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Find a Match</h3>
+            <p>Read job descriptions and check compensation details</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Apply via WhatsApp</h3>
+            <p>One-click application through WhatsApp - fast and simple</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Contact</h2>
+        <p>
+          Have questions or want to post a job? Get in touch with us.
+        </p>
+      </section>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--text);
+  }
+
+  .section {
+    margin-bottom: 3rem;
+  }
+
+  .section h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  .section p {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--text-light);
+  }
+
+  .steps {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+
+  .step-number {
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .step h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+
+  .step p {
+    font-size: 1rem;
+    color: var(--text-light);
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 1.75rem;
+    }
+
+    .section h2 {
+      font-size: 1.5rem;
+    }
+
+    .step {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+</style>

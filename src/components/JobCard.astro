@@ -1,0 +1,142 @@
+---
+import type { Job } from '../payload-types';
+
+interface Props {
+  job: Job;
+}
+
+const { job } = Astro.props;
+
+const jobTypeLabels: Record<string, string> = {
+  bar: '🍺 Bar Staff',
+  kitchen: '👨‍🍳 Kitchen Helper',
+  delivery: '🚴 Delivery',
+  cleaning: '🧹 Cleaning',
+  warehouse: '📦 Warehouse',
+  event: '🎉 Event Staff',
+  other: '💼 Other',
+};
+
+const jobTypeLabel = jobTypeLabels[job.jobType as string] || job.jobType;
+
+// Format date
+const createdDate = new Date(job.createdAt);
+const daysAgo = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
+const dateLabel = daysAgo === 0 ? 'Heute' : daysAgo === 1 ? 'Gestern' : `vor ${daysAgo} Tagen`;
+---
+
+<article class="job-card">
+  <a href={`/jobs/${job.id}`} class="job-card-link">
+    <div class="job-card-header">
+      <h2 class="job-title">{job.title}</h2>
+      <span class="job-type">{jobTypeLabel}</span>
+    </div>
+
+    <div class="job-meta">
+      <span class="meta-item">📍 {job.district}</span>
+      <span class="meta-item">💰 €{job.hourlyRate}/Std</span>
+      <span class="meta-item">⏰ {job.hoursPerWeek}</span>
+    </div>
+
+    <div class="job-footer">
+      <span class="job-date">{dateLabel}</span>
+    </div>
+  </a>
+</article>
+
+<style>
+  .job-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .job-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .job-card-link {
+    display: block;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .job-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .job-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .job-type {
+    background: var(--bg-gray);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .job-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .meta-item {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .job-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .job-date {
+    font-size: 0.75rem;
+    color: var(--text-light);
+  }
+
+  @media (max-width: 768px) {
+    .job-card-link {
+      padding: 1rem;
+    }
+
+    .job-card-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .job-title {
+      font-size: 1.125rem;
+    }
+
+    .job-meta {
+      gap: 0.75rem;
+    }
+
+    .meta-item {
+      font-size: 0.8125rem;
+    }
+  }
+</style>
